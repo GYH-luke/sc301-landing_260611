@@ -520,7 +520,7 @@
    CONFIG
    ★ Apps Script 배포 후 GAS_URL에 웹 앱 URL을 붙여넣으세요
 ================================================================ */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwDbxkW9iCMhM4Sb1iX691oZZbFKijNgx2mseG1uVJpQZaUN-v48Eq-upPtr4kkRZfysw/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw-WIUzaXHCgpVJLBSAcgrIDTibPBiH5Bpg1HOA8TtMCSZJk_ZybV9yhKqwr5l3tQd2/exec';
 const TOTAL = 6;
 let cur = 1;
 
@@ -640,13 +640,11 @@ async function submitForm() {
     });
   }
 
-  /* ── Google Sheets 전송 ── */
-  try {
-    var params = new URLSearchParams({ nm: name, ph: phone, cs: consult });
-    await fetch(GAS_URL + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
-  } catch (err) {
-    console.error('전송 오류:', err);
-  }
+  /* ── Google Sheets 전송 (Image beacon — CORS 우회, 전송 100% 보장) ── */
+  var params = new URLSearchParams({ nm: name, ph: phone, cs: consult });
+  var beacon = new Image();
+  beacon.src = GAS_URL + '?' + params.toString();
+  console.log('전송 URL:', beacon.src);
 
   /* Thank you */
   document.getElementById('s6').classList.remove('on');
