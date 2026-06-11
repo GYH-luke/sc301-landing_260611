@@ -596,6 +596,32 @@ function go(step) {
 }
 
 /* ================================================================
+   FAKE PHONE DETECTION
+================================================================ */
+function isFakePhone(phone) {
+  var d    = phone.replace(/\D/g, '');
+  if (d.length < 10) return true;
+
+  var mid  = d.slice(3, 7);
+  var last = d.slice(7);
+  var body = d.slice(3);
+
+  // 중간 4자리 & 뒷 4자리 각각 동일 숫자 (010-2222-7777 등)
+  var midSame  = mid.split('').every(function(c){ return c === mid[0]; });
+  var lastSame = last.split('').every(function(c){ return c === last[0]; });
+  if (midSame && lastSame) return true;
+
+  // 뒷 8자리 전체 동일 숫자 (010-1111-1111 등)
+  if (body.split('').every(function(c){ return c === body[0]; })) return true;
+
+  // 순차 번호 (010-1234-5678 / 010-9876-5432)
+  if ('0123456789012345678'.indexOf(body) !== -1) return true;
+  if ('9876543210987654321'.indexOf(body) !== -1) return true;
+
+  return false;
+}
+
+/* ================================================================
    PHONE FORMAT
 ================================================================ */
 document.getElementById('iPhone').addEventListener('input', function(e) {
@@ -626,6 +652,13 @@ async function submitForm() {
 
   if (!phone || phone.replace(/\D/g,'').length < 10) {
     phoneEl.classList.add('err'); phoneEl.focus(); return;
+  }
+  if (isFakePhone(phone)) {
+    phoneEl.classList.add('err');
+    phoneEl.value = '';
+    phoneEl.placeholder = '올바른 연락처를 입력해주세요';
+    phoneEl.focus();
+    return;
   }
   phoneEl.classList.remove('err');
 
